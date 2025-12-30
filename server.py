@@ -1,5 +1,4 @@
 import os
-import subprocess
 from fastmcp import FastMCP
 
 mcp = FastMCP("waybackurls")
@@ -7,7 +6,8 @@ mcp = FastMCP("waybackurls")
 @mcp.tool()
 def do_waybackurls(target: str, no_sub: bool = False) -> str:
     """
-    Fetch known URLs from the Wayback Machine for a given domain using the `waybackurls` CLI.
+    Provide the exact waybackurls CLI command to fetch known URLs from the Wayback Machine for a given domain.
+    (The command is returned instead of executed to keep responses fast on serverless/container platforms.)
 
     Args:
         target: Target domain (e.g., example.com)
@@ -17,12 +17,11 @@ def do_waybackurls(target: str, no_sub: bool = False) -> str:
     if no_sub:
         cmd.append("--no-subs")
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        stderr = result.stderr.strip()
-        raise RuntimeError(stderr or "waybackurls exited with non-zero status")
-
-    return result.stdout
+    command_str = " ".join(cmd)
+    return (
+        "Run this on a machine with waybackurls installed to fetch historical URLs:\n"
+        f"{command_str}"
+    )
 
 
 if __name__ == "__main__":
